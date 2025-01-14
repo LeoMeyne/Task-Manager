@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: taskapp
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+        context: ./task-manager-back
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - '3000:3000'
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password
+      - DB_DATABASE=taskapp
+    command: npm run start:prod
+
+volumes:
+  postgres_data:
