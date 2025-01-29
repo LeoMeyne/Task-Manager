@@ -4,19 +4,36 @@ import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { Project } from '../projects/entities/project.entity';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private tasksRepository: Repository<Task>,
+
+    @InjectRepository(Project)
+    private projectsRepository: Repository<Project>,
   ) {}
 
-  // Créer une tâche
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
-    const task = this.tasksRepository.create(createTaskDto);
+    const project = await this.projectsRepository.findOne({
+      where: { id: createTaskDto.projectId }
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Projet avec l'id ${createTaskDto.projectId} non trouvé.`);
+    }
+
+    const task = new Task();  // ✅ Correction : utiliser un objet explicite
+    task.title = createTaskDto.title;
+    task.description = createTaskDto.description;
+    task.status = 'todo';
+    task.project = project;  // 🔗 Lier la tâche au projet
+
     return this.tasksRepository.save(task);
   }
+
 
   // Récupérer toutes les tâches
   async findAll(): Promise<Task[]> {

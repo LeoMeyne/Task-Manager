@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Project } from '../../projects/entities/project.entity';
+
 
 @Entity()
 export class Task {
@@ -17,4 +19,7 @@ export class Task {
 
   @ManyToOne(() => User, (user) => user.tasks)
   user: User;  // Association avec un utilisateur
+
+  @ManyToOne(() => Project, (project) => project.tasks, { eager: true, onDelete: 'CASCADE' })
+  project: Project;
 }

@@ -7,6 +7,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MessagingModule } from './messaging/messaging.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import {TypeOrmModule} from '@nestjs/typeorm';
     TasksModule,
     NotificationsModule,
     MessagingModule,
+    ProjectsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'db',
@@ -25,6 +27,7 @@ import {TypeOrmModule} from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
