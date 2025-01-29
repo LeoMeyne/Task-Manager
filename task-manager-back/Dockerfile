@@ -20,4 +20,4 @@ RUN npm run build  #
 EXPOSE 3000
 
 # Étape 8 : Lancer l'application en production
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:prod"]
