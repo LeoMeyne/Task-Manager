@@ -8,73 +8,73 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: taskapp
-    ports:
-      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
 
   app1:
     build:
-      context: ./task-manager-back  # ✅ Indique le dossier contenant le Dockerfile
-      dockerfile: Dockerfile         # ✅ S'assure qu'il utilise bien ce fichier
+      context: ./task-manager-back
+      dockerfile: Dockerfile
     container_name: task-manager-app-1
     restart: always
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=password
-      - DB_DATABASE=taskapp
     expose:
-      - "3000"
+      - "3000"  
+    networks:
+      - app_network
 
   app2:
     build:
-      context: ./task-manager-back  # ✅ Indique le bon chemin
+      context: ./task-manager-back
       dockerfile: Dockerfile
     container_name: task-manager-app-2
     restart: always
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=password
-      - DB_DATABASE=taskapp
     expose:
       - "3000"
+    networks:
+      - app_network
 
   app3:
     build:
-      context: ./task-manager-back  # ✅ Indique le bon chemin
+      context: ./task-manager-back
       dockerfile: Dockerfile
     container_name: task-manager-app-3
     restart: always
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=password
-      - DB_DATABASE=taskapp
     expose:
       - "3000"
+    networks:
+      - app_network
 
   nginx:
     image: nginx:latest
     container_name: task-manager-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./task-manager-micro-front/auth:/usr/share/nginx/html/auth
+      - ./task-manager-micro-front/dashboard:/usr/share/nginx/html/dashboard
+      - ./task-manager-micro-front/projects:/usr/share/nginx/html/projects
+      - ./task-manager-micro-front/tasks:/usr/share/nginx/html/tasks
+      - ./task-manager-micro-front/notifications:/usr/share/nginx/html/notifications
     depends_on:
       - app1
       - app2
       - app3
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - app_network
 
 volumes:
   postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
