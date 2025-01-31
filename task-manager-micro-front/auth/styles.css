@@ -1,16 +1,23 @@
 body {
     font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
 }
 
-h1 {
-    margin-bottom: 20px;
+.card {
+    border-radius: 10px;
+    border: none;
 }
 
-form {
-    max-width: 400px;
-    margin: 0 auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+input:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+button {
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.9;
 }

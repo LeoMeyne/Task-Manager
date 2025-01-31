@@ -1,34 +1,48 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
-
-  private users = [];
-  constructor(private jwtService: JwtService) {
-    this.seedUser();
-  }
-
-  private async seedUser(){
-    const hashedPassword = await bcrypt.hash('admin123', 10);
-    this.users.push({ id: 1, username: 'admin', password: hashedPassword });
-  }
+  constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    private jwtService: JwtService,
+  ) {}
 
   async checkUser(username: string, password: string): Promise<any> {
-    const user = this.users.find(user => user.username === username);
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
+    console.log('Checking user in database:', username);
+
+    // Récupère l'utilisateur en base
+    const user = await this.usersRepository.findOne({ where: { username } });
+    if (!user) {
+      console.error('User not found:', username);
+      throw new UnauthorizedException('Invalid username or password');
     }
-    throw new UnauthorizedException();
+
+    // Vérifie le mot de passe
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      console.error('Invalid password for user:', username);
+      throw new UnauthorizedException('Invalid username or password');
+    }
+
+    console.log('User authenticated successfully:', username);
+    const { password: _, ...result } = user;
+    return result;
   }
 
-  async login(user: any){
-    const payload = { username: user.username, password: user.password };
-    return{
+  async login(user: any) {
+    const payload = { username: user.username, role: user.role };
+    return {
       accessToken: this.jwtService.sign(payload),
-    }
+    };
   }
 
+  async addUser(userData: Partial<User>) {
+    const newUser = this.usersRepository.create(userData);
+    return await this.usersRepository.save(newUser);
+  }
 }
