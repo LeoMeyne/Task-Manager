@@ -20,6 +20,9 @@ export class UsersService {
       role: createUserDto.role,
     });
 
+    console.log('User created:', newUser);
+
+
     return await this.usersRepository.save(newUser);
   }
 

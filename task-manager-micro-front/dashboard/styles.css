@@ -1,9 +1,26 @@
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
+.project-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease;
+    margin-bottom: 10px;
 }
 
-h1 {
-    margin-bottom: 20px;
-    text-align: center;
+.project-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.project-card .card-body {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-title {
+    flex-grow: 1;
+}
+
+.project-view-btn {
+    margin-left: auto;
 }

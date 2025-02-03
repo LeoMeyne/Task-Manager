@@ -1,7 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+} from 'typeorm';
 import { Project } from '../../projects/entities/project.entity';
-
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Task {
@@ -14,12 +19,15 @@ export class Task {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ default: 'todo' })
-  status: 'todo' | 'in_progress' | 'done';
+  @Column()
+  status: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @ManyToOne(() => Project, (project) => project.tasks, { onDelete: 'CASCADE' })
+  project: Project;
 
   @ManyToOne(() => User, (user) => user.tasks)
-  user: User;  // Association avec un utilisateur
-
-  @ManyToOne(() => Project, (project) => project.tasks, { eager: true, onDelete: 'CASCADE' })
-  project: Project;
+  createdBy: User;
 }

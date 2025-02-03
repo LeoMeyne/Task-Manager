@@ -1,20 +1,33 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, NotFoundException, Post, Body, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { CreateProjectDto } from './dto/create-project.dto';
+import { TasksService } from '../tasks/tasks.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { AddMemberDto } from './dto/add-member.dto';
-import { RemoveMemberDto } from './dto/remove-member.dto';
+import { CreateTaskDto } from '../tasks/dto/create-task.dto';
+import { CreateProjectDto } from './dto/create-project.dto';
 
 @Controller('projects')
 @UseGuards(JwtAuthGuard)
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly tasksService: TasksService
+  ) {}
 
-  @UseGuards(new RolesGuard('team_leader'))  // Seul un chef d’équipe peut créer un projet
-  @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto);
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const project = await this.projectsService.findOne(id);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found.`);
+    }
+    return project;
+  }
+
+  @Post(':id/tasks')
+  async createTask(
+    @Param('id', ParseIntPipe) projectId: number,
+    @Body() createTaskDto: CreateTaskDto
+  ) {
+    return this.tasksService.create(createTaskDto, projectId);
   }
 
   @Get()
@@ -22,28 +35,8 @@ export class ProjectsController {
     return this.projectsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: CreateProjectDto) {
-    return this.projectsService.update(+id, updateProjectDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(+id);
-  }
-
-  @Post(':id/members')
-  addMember(@Param('id') projectId: string, @Body() addMemberDto: AddMemberDto) {
-    return this.projectsService.addMember(+projectId, addMemberDto.userId);
-  }
-
-  @Delete(':id/members')
-  removeMember(@Param('id') projectId: string, @Body() removeMemberDto: RemoveMemberDto) {
-    return this.projectsService.removeMember(+projectId, removeMemberDto.userId);
+  @Post()
+  create(@Body() createProjectDto: CreateProjectDto) {
+    return this.projectsService.create(createProjectDto);
   }
 }

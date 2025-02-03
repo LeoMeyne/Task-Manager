@@ -13,7 +13,7 @@ export class User {
   @Column()
   password: string;  // Mot de passe (hashé)
 
-  @OneToMany(() => Task, (task) => task.user)
+  @OneToMany(() => Task, (task) => task.createdBy)
   tasks: Task[];  // Association avec les tâches
 
   @OneToMany(() => Project, (project) => project.teamLeader)

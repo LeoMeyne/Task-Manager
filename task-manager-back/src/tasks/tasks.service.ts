@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
+import { Project } from '../projects/entities/project.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { Project } from '../projects/entities/project.entity';
 
 @Injectable()
 export class TasksService {
@@ -13,49 +13,57 @@ export class TasksService {
     private tasksRepository: Repository<Task>,
 
     @InjectRepository(Project)
-    private projectsRepository: Repository<Project>,
+    private projectsRepository: Repository<Project>
   ) {}
 
-  async create(createTaskDto: CreateTaskDto): Promise<Task> {
-    const project = await this.projectsRepository.findOne({
-      where: { id: createTaskDto.projectId }
-    });
+  async create(createTaskDto: CreateTaskDto, projectId: number): Promise<Task> {
+    const project = await this.projectsRepository.findOne({ where: { id: projectId } });
 
     if (!project) {
-      throw new NotFoundException(`Projet avec l'id ${createTaskDto.projectId} non trouvé.`);
+      throw new NotFoundException(`Project with ID ${projectId} not found.`);
     }
 
-    const task = new Task();  // ✅ Correction : utiliser un objet explicite
-    task.title = createTaskDto.title;
-    task.description = createTaskDto.description;
-    task.status = 'todo';
-    task.project = project;  // 🔗 Lier la tâche au projet
+    const task = this.tasksRepository.create({
+      title: createTaskDto.title,
+      description: createTaskDto.description,
+      status: 'todo',
+      project,
+    });
 
     return this.tasksRepository.save(task);
   }
 
+  // **Ajout des méthodes manquantes**
 
-  // Récupérer toutes les tâches
   async findAll(): Promise<Task[]> {
-    return this.tasksRepository.find();
+    return this.tasksRepository.find({ relations: ['project', 'createdBy'] });
   }
 
-  // Récupérer une tâche par ID
   async findOne(id: number): Promise<Task> {
-    const task = await this.tasksRepository.findOne({ where: { id } });
-    if (!task) throw new NotFoundException(`Tâche avec l'id ${id} non trouvée`);
+    const task = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['project', 'createdBy'],
+    });
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found.`);
+    }
+
     return task;
   }
 
-  // Mettre à jour une tâche
   async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
-    await this.tasksRepository.update(id, updateTaskDto);
-    return this.findOne(id);
+    const task = await this.findOne(id);
+
+    Object.assign(task, updateTaskDto);
+    return this.tasksRepository.save(task);
   }
 
-  // Supprimer une tâche
   async remove(id: number): Promise<void> {
     const result = await this.tasksRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException(`Tâche avec l'id ${id} non trouvée`);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with ID ${id} not found.`);
+    }
   }
 }

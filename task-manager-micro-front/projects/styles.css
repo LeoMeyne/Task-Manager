@@ -1,14 +1,19 @@
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    background-color: #fff;
 }
 
-h1 {
-    margin-bottom: 20px;
-    text-align: center;
+.task-item span {
+    font-weight: 500;
 }
 
-#add-project {
-    display: block;
-    margin: 0 auto;
+.task-item .view-btn {
+    margin-left: auto;
 }

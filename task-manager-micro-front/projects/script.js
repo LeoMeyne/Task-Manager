@@ -1,31 +1,86 @@
-async function fetchProjects() {
-    try {
-        const response = await fetch('/api/projects');
-        if (!response.ok) throw new Error('Erreur lors du chargement des projets.');
+document.addEventListener('DOMContentLoaded', async function () {
+    const projectId = localStorage.getItem('currentProjectId');
+    const token = localStorage.getItem('accessToken');
 
-        const projects = await response.json();
-        const projectsList = document.getElementById('projects-list');
-
-        projectsList.innerHTML = '';
-        projects.forEach(project => {
-            const projectCard = document.createElement('div');
-            projectCard.className = 'card mb-3';
-            projectCard.innerHTML = `
-                <div class="card-body">
-                    <h5 class="card-title">${project.name}</h5>
-                    <p class="card-text">${project.description}</p>
-                    <a href="/tasks/?projectId=${project.id}" class="btn btn-primary">Voir les tâches</a>
-                </div>
-            `;
-            projectsList.appendChild(projectCard);
-        });
-    } catch (error) {
-        alert(error.message);
+    if (!token || !projectId) {
+        window.location.href = '/dashboard/';
+        return;
     }
-}
 
-document.getElementById('add-project').addEventListener('click', () => {
-    window.location.href = '/projects/create.html';
+    try {
+        // Récupérer les détails du projet
+        const response = await fetch(`/api/projects/${projectId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load project details.');
+        }
+
+        const project = await response.json();
+        document.getElementById('project-title').innerText = project.name;
+
+        // Afficher les tâches
+        const tasksList = document.getElementById('tasks-list');
+        const noTasksMsg = document.getElementById('no-tasks-msg');
+
+        if (project.tasks && project.tasks.length > 0) {
+            noTasksMsg.style.display = 'none';
+            project.tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    <span>
+                        <strong>${task.title}</strong>
+                        <p>${task.description}</p>
+                    </span>
+                    <span class="badge bg-primary">${task.status.toUpperCase()}</span>
+                `;
+                tasksList.appendChild(li);
+            });
+        } else {
+            noTasksMsg.style.display = 'block';
+        }
+
+        // Gestion du bouton retour au dashboard
+        document.getElementById('back-to-dashboard-btn').addEventListener('click', function () {
+            window.location.href = '/dashboard/';
+        });
+
+        // Gestion de la création de tâche
+        document.getElementById('create-task-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+
+            try {
+                const createResponse = await fetch(`/api/projects/${projectId}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, description })
+                });
+
+                if (!createResponse.ok) {
+                    throw new Error('Failed to create task.');
+                }
+
+                alert('Task created successfully!');
+                window.location.reload();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+    } catch (error) {
+        alert('Error: ' + error.message);
+        window.location.href = '/dashboard/';
+    }
 });
-
-fetchProjects();

@@ -27,14 +27,6 @@ export class ProjectsService {
     return this.projectsRepository.find();
   }
 
-  async findOne(id: number): Promise<Project> {
-    const project = await this.projectsRepository.findOne({ where: { id } });
-    if (!project) {
-      throw new NotFoundException(`Projet avec l'id ${id} non trouvé.`);
-    }
-    return project;
-  }
-
   async update(id: number, updateProjectDto: CreateProjectDto): Promise<Project> {
     await this.projectsRepository.update(id, updateProjectDto);
     return this.findOne(id);
@@ -79,5 +71,18 @@ export class ProjectsService {
     project.members = project.members.filter(member => member.id !== userId);
 
     return this.projectsRepository.save(project);
+  }
+
+  async findOne(id: number): Promise<Project> {
+    const project = await this.projectsRepository.findOne({
+      where: { id },
+      relations: ['tasks'],  // Charger les tâches associées
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Projet avec l'id ${id} non trouvé.`);
+    }
+
+    return project;
   }
 }
