@@ -4,8 +4,6 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TasksModule } from './tasks/tasks.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { MessagingModule } from './messaging/messaging.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import { ProjectsModule } from './projects/projects.module';
 
@@ -14,8 +12,6 @@ import { ProjectsModule } from './projects/projects.module';
     AuthModule,
     UsersModule,
     TasksModule,
-    NotificationsModule,
-    MessagingModule,
     ProjectsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',

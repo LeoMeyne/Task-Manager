@@ -5,19 +5,19 @@ import { Project } from '../../projects/entities/project.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;  // Clé primaire
+  id: number;
 
   @Column({ unique: true })
-  username: string;  // Nom d'utilisateur unique
+  username: string;
 
   @Column()
-  password: string;  // Mot de passe (hashé)
+  password: string;
 
   @OneToMany(() => Task, (task) => task.createdBy)
-  tasks: Task[];  // Association avec les tâches
+  tasks: Task[];
 
   @OneToMany(() => Project, (project) => project.teamLeader)
-  projects: Project[];  // Projets créés par l'utilisateur
+  projects: Project[];
 
   @Column({ default: 'user' })
   role: 'user' | 'team_leader';

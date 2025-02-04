@@ -4,10 +4,10 @@ import { Project } from './entities/project.entity';
 import { ProjectsService } from './projects.service';
 import { ProjectsController } from './projects.controller';
 import { User } from '../users/entities/user.entity';
-import { TasksModule } from '../tasks/tasks.module';  // Maintenir cet import
+import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project, User]), TasksModule],  // Cet import reste
+  imports: [TypeOrmModule.forFeature([Project, User]), TasksModule],
   controllers: [ProjectsController],
   providers: [ProjectsService],
   exports: [ProjectsService],

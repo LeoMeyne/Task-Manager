@@ -9,18 +9,19 @@
 </head>
 <body class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
 
-    <!-- Contenu principal -->
+    <!-- Project details container -->
     <div class="container mt-5">
         <button id="back-to-dashboard-btn" class="btn btn-secondary mb-3">Back to Dashboard</button>
         <h2 id="project-title" class="mb-4"></h2>
         <ul id="tasks-list" class="list-group"></ul>
         <p id="no-tasks-msg" class="text-muted">No tasks found.</p>
+        <!-- Button to open task creation modal -->
         <button id="create-task-btn" class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#createTaskModal">
             Create Task
         </button>
     </div>
 
-    <!-- Modal pour créer une tâche -->
+    <!-- Modal for creating a task -->
     <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

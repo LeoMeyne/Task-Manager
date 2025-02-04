@@ -12,28 +12,26 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  // Check user credentials and authenticate
   async checkUser(username: string, password: string): Promise<any> {
-    console.log('Checking user in database:', username);
-
-    // Récupère l'utilisateur en base
+    // Retrieve user from the database
     const user = await this.usersRepository.findOne({ where: { username } });
     if (!user) {
-      console.error('User not found:', username);
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    // Vérifie le mot de passe
+    // Verify the password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      console.error('Invalid password for user:', username);
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    console.log('User authenticated successfully:', username);
+    // Return user data without the password
     const { password: _, ...result } = user;
     return result;
   }
 
+  // Generate a JWT access token for a user
   async login(user: any) {
     const payload = { username: user.username, role: user.role };
     return {
@@ -41,6 +39,7 @@ export class AuthService {
     };
   }
 
+  // Add a new user to the database
   async addUser(userData: Partial<User>) {
     const newUser = this.usersRepository.create(userData);
     return await this.usersRepository.save(newUser);

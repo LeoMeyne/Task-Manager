@@ -1,14 +1,16 @@
 document.addEventListener('DOMContentLoaded', async function () {
+
     const projectId = localStorage.getItem('currentProjectId');
     const token = localStorage.getItem('accessToken');
 
+    // Redirect to dashboard if token or project ID is missing
     if (!token || !projectId) {
         window.location.href = '/dashboard/';
         return;
     }
 
     try {
-        // Récupérer les détails du projet
+        // Fetch project details
         const response = await fetch(`/api/projects/${projectId}`, {
             method: 'GET',
             headers: {
@@ -17,14 +19,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to load project details.');
-        }
+        if (!response.ok) throw new Error('Failed to load project details.');
 
         const project = await response.json();
         document.getElementById('project-title').innerText = project.name;
 
-        // Afficher les tâches
+        // Display tasks
         const tasksList = document.getElementById('tasks-list');
         const noTasksMsg = document.getElementById('no-tasks-msg');
 
@@ -46,12 +46,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             noTasksMsg.style.display = 'block';
         }
 
-        // Gestion du bouton retour au dashboard
+        // Handle back to dashboard button click
         document.getElementById('back-to-dashboard-btn').addEventListener('click', function () {
             window.location.href = '/dashboard/';
         });
 
-        // Gestion de la création de tâche
+        // Handle task creation form submission
         document.getElementById('create-task-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
@@ -68,9 +68,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     body: JSON.stringify({ title, description })
                 });
 
-                if (!createResponse.ok) {
-                    throw new Error('Failed to create task.');
-                }
+                if (!createResponse.ok) throw new Error('Failed to create task.');
 
                 alert('Task created successfully!');
                 window.location.reload();

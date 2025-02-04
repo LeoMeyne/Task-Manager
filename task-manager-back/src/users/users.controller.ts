@@ -6,9 +6,9 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Handle POST requests to create a new user
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto, "erd");
     return await this.usersService.createUser(createUserDto);
   }
 }

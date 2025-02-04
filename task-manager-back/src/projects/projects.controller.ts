@@ -6,13 +6,14 @@ import { CreateTaskDto } from '../tasks/dto/create-task.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 
 @Controller('projects')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)  // Protect all routes with JWT authentication
 export class ProjectsController {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly tasksService: TasksService
   ) {}
 
+  // Retrieve a specific project by ID
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const project = await this.projectsService.findOne(id);
@@ -22,6 +23,7 @@ export class ProjectsController {
     return project;
   }
 
+  // Create a new task within a project
   @Post(':id/tasks')
   async createTask(
     @Param('id', ParseIntPipe) projectId: number,
@@ -30,11 +32,13 @@ export class ProjectsController {
     return this.tasksService.create(createTaskDto, projectId);
   }
 
+  // Retrieve all projects
   @Get()
   findAll() {
     return this.projectsService.findAll();
   }
 
+  // Create a new project
   @Post()
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(createProjectDto);

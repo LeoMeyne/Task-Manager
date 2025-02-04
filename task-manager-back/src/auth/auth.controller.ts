@@ -7,14 +7,15 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // Handle user login, using LocalAuthGuard for authentication
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() req) {
-    console.log('User attempting login:', req.user);
     return this.authService.login(req.user);
   }
 
-  @UseGuards(JwtAuthGuard)  // Utilise le JwtAuthGuard pour vérifier l'authentification
+  // Get the authenticated user's profile, using JwtAuthGuard for authorization
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   getProfile(@Req() req) {
     return {

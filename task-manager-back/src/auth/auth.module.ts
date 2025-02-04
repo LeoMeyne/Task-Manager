@@ -10,7 +10,7 @@ import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),  // Enregistre le dépôt UserRepository
+    TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
       secret: 'secretKey',

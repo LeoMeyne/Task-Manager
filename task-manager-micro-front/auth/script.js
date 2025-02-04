@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Gestion du formulaire de connexion
+
+    // Handle login form submission
     document.getElementById('login-form').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -17,24 +18,17 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify({ username, password }),
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Invalid credentials');
-            }
+            if (!response.ok) throw new Error('Invalid credentials');
             return response.json();
         })
         .then(data => {
-            // Stocke le token dans le stockage local
-            localStorage.setItem('accessToken', data.accessToken);
-
-            // Redirige vers la page Dashboard
-            window.location.href = '/dashboard/';
+            localStorage.setItem('accessToken', data.accessToken);  // Store token
+            window.location.href = '/dashboard/';  // Redirect to dashboard
         })
-        .catch(error => {
-            alert('Login failed: ' + error.message);
-        });
+        .catch(() => alert('Login failed'));
     });
 
-    // Gestion du formulaire d'enregistrement d'utilisateur
+    // Handle user registration form submission
     document.getElementById('add-user-form').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -53,19 +47,14 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify({ username, password, role }),
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to register user');
-            }
+            if (!response.ok) throw new Error('Failed to register user');
             return response.json();
         })
-        .then(data => {
+        .then(() => {
             alert('User registered successfully!');
-            // Ferme le modal
             const addUserModal = new bootstrap.Modal(document.getElementById('addUserModal'));
-            addUserModal.hide();
+            addUserModal.hide();  // Close modal
         })
-        .catch(error => {
-            alert('Registration failed: ' + error.message);
-        });
+        .catch(() => alert('Registration failed'));
     });
 });

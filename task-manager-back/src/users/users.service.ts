@@ -11,6 +11,7 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
+  // Create a new user with hashed password
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
@@ -20,12 +21,10 @@ export class UsersService {
       role: createUserDto.role,
     });
 
-    console.log('User created:', newUser);
-
-
     return await this.usersRepository.save(newUser);
   }
 
+  // Retrieve all users from the database
   async getAllUsers(): Promise<User[]> {
     return await this.usersRepository.find();
   }
